@@ -20,8 +20,19 @@ type UI struct {
 	window      *app.Window
 	darkTheme   *Theme
 	lightTheme  *Theme
-	activeTheme *Theme // 指向当前使用的主题
+	activeTheme *Theme // Points to the currently used theme
 	vm          *HomeView
+}
+
+// Add a method to UI to toggle the theme
+func (ui *UI) toggleTheme() {
+	if ui.activeTheme == ui.darkTheme {
+		ui.activeTheme = ui.lightTheme
+	} else {
+		ui.activeTheme = ui.darkTheme
+	}
+	// Invalidate the window to trigger a redraw with the new theme
+	ui.window.Invalidate()
 }
 
 // Loop runs the application's main event loop.
@@ -43,7 +54,8 @@ func (ui *UI) Loop() error {
 // layout renders the application's UI.
 func (ui *UI) layout(gtx C) D {
 	if ui.vm == nil {
-		ui.vm = newHome(ui.window)
+		// Pass the theme toggle function to the home view constructor
+		ui.vm = newHome(ui.window, ui.toggleTheme)
 	}
 
 	return ui.vm.Layout(gtx, ui.activeTheme)
@@ -56,16 +68,15 @@ func main() {
 		appTitle := "Gio Desktop App"
 		w.Option(app.Title(appTitle))
 
-		// --- 已修正: 初始化两个主题 ---
 		darkTheme := NewDarkTheme()
 		lightTheme := NewLightTheme()
 
 		ui := &UI{
 			window: w,
-			// 设置主题，并默认激活深色主题
+			// Set up both themes and activate one by default
 			darkTheme:   darkTheme,
 			lightTheme:  lightTheme,
-			activeTheme: lightTheme,
+			activeTheme: lightTheme, // Start with the light theme
 		}
 
 		if err := ui.Loop(); err != nil {
