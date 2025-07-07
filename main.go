@@ -1,14 +1,12 @@
 package main
 
 import (
-	"image/color"
 	"log"
 	"os"
 
 	"gioui.org/app"
 	"gioui.org/layout"
 	"gioui.org/op"
-	"gioui.org/unit"
 	"github.com/oligo/gioview/view"
 )
 
@@ -19,9 +17,11 @@ type (
 
 // UI holds all of the application's state
 type UI struct {
-	window *app.Window
-	theme  *Theme
-	vm     *HomeView
+	window      *app.Window
+	darkTheme   *Theme
+	lightTheme  *Theme
+	activeTheme *Theme // 指向当前使用的主题
+	vm          *HomeView
 }
 
 // Loop runs the application's main event loop.
@@ -46,22 +46,28 @@ func (ui *UI) layout(gtx C) D {
 		ui.vm = newHome(ui.window)
 	}
 
-	return ui.vm.Layout(gtx, ui.theme)
+	return ui.vm.Layout(gtx, ui.activeTheme)
 }
 
 func main() {
 	go func() {
 		w := &app.Window{}
-		w.Option(app.Title("Gio Desktop App"))
-		th := NewTheme()
-		th.TextSize = unit.Sp(14)
-		th.Bg2 = color.NRGBA{R: 0x2e, G: 0x34, B: 0x40, A: 255}
-		th.Bg = color.NRGBA{R: 0x24, G: 0x28, B: 0x32, A: 255}
-		th.Fg = color.NRGBA{R: 0xe5, G: 0xe9, B: 0xf0, A: 255}
-		th.ContrastBg = color.NRGBA{R: 0x88, G: 0xc0, B: 0xd0, A: 255}
-		th.ContrastFg = color.NRGBA{R: 0x24, G: 0x28, B: 0x32, A: 255}
+		w.Option(app.Decorated(true))
+		appTitle := "Gio Desktop App"
+		w.Option(app.Title(appTitle))
 
-		ui := &UI{theme: th, window: w}
+		// --- 已修正: 初始化两个主题 ---
+		darkTheme := NewDarkTheme()
+		lightTheme := NewLightTheme()
+
+		ui := &UI{
+			window: w,
+			// 设置主题，并默认激活深色主题
+			darkTheme:   darkTheme,
+			lightTheme:  lightTheme,
+			activeTheme: lightTheme,
+		}
+
 		if err := ui.Loop(); err != nil {
 			log.Fatal(err)
 		}
