@@ -1,6 +1,8 @@
 package main
 
 import (
+	"gioview-desk-app/views"
+
 	"gioui.org/app"
 	"gioui.org/layout"
 	"gioui.org/op/clip"
@@ -8,7 +10,6 @@ import (
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material" // Import material for the button
-	"gioview-desk-app/views"
 	"github.com/oligo/gioview/navi"
 	"github.com/oligo/gioview/theme"
 	"github.com/oligo/gioview/view"
@@ -44,7 +45,7 @@ func (hv *HomeView) Layout(gtx C, th *theme.Theme) layout.Dimensions {
 
 	return layout.Flex{
 		Axis:      layout.Horizontal,
-		Alignment: layout.Start,
+		Alignment: layout.Baseline,
 	}.Layout(gtx,
 		// Define the sidebar region
 		layout.Rigid(func(gtx C) D {
