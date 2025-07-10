@@ -1,6 +1,7 @@
 package views
 
 import (
+	"github.com/sqweek/dialog"
 	"log"
 
 	"gioui.org/layout"
@@ -42,7 +43,16 @@ func (v *ViewA) Title() string {
 func (v *ViewA) Layout(gtx layout.Context, th *theme.Theme) layout.Dimensions {
 	if v.button.Clicked(gtx) {
 		log.Printf("Button clicked! Input text: %s", v.input.Text())
-		v.buttonText = "Clicked!"
+		//ok := dialog.Message("Input text: %s", v.input.Text()).Title("Input").YesNo()
+		//log.Printf("Dialog result: %v", ok)
+		filename, err := dialog.File().Filter("图片文件", "jpg", "txt").Load()
+
+		if err != nil {
+			log.Printf("Error: %v", err)
+		} else {
+			log.Printf("Selected file: %s", filename)
+		}
+		dialog.Message("Selected file: %s", filename).Title("Selected file").YesNo()
 	}
 
 	return v.PageStyle.Layout(gtx, th, func(gtx layout.Context) layout.Dimensions {
